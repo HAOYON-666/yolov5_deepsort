@@ -1,18 +1,49 @@
-# 本文禁止转载!
+
+# Introduction
+This project uses the YOLOv5 model and Deepsort algorithm to achieve object tracking and counting. The code for each part has been encapsulated and can be easily embedded into your own project. In this project, you can add parameters to specify the video or local camera that needs to be inferred; You can also specify whether the parameter will save the tracked data, which includes target category and bounding box information; You can also add parameters to track the targets you are interested in and save the corresponding tracking data. Below are some detailed introduction, hoping to get your star!
 
 
-本文地址：[https://blog.csdn.net/weixin_44936889/article/details/112002152](https://blog.csdn.net/weixin_44936889/article/details/112002152)
+# Prepare
+1 Create a virtual environment 
 
-# 项目简介：
-使用YOLOv5+Deepsort实现车辆行人追踪和计数，代码封装成一个Detector类，更容易嵌入到自己的项目中。
+    conda env create -f environment.yml   
+    conda activate yolov5_deepsort   
 
-代码地址（欢迎star）：
+2 Install all dependencies
 
-[https://github.com/Sharpiless/yolov5-deepsort/](https://github.com/Sharpiless/yolov5-deepsort/)
+    pip install -r requirements.txt
 
-最终效果：
-![在这里插入图片描述](https://github.com/Sharpiless/Yolov5-Deepsort/blob/main/image.png)
-# YOLOv5检测器：
+3 Download weight file (optional)
+
+    Download the yolov5 weight. I already put the yolov5s.pt inside. If you need other models, please go to official site of yolov5. and place the downlaoded .pt file under ./weights/yolov5s.pt. And I also aready downloaded the deepsort weights. You can also download it from here, and place ckpt.t7 file under ./deep_sort/deep_sort/deep/checkpoint/ckpt.t7
+
+
+# Run
+
+    cd yolov5_deepsort
+
+If you want to track the target in this video or camera, you can run this script by replacing the parameter after -- source with the video file path or 0 (webcam), which is a required parameter. Then you can choose to set -- save_video, which is an output video file name, but it is not necessary. If you do not set it, it will default to result.mp4 and the output video file will be saved Under the directory of ./results/video.
+
+    python detect.py --source        #(necessary)The input video,you must input file name or 0(webcam)
+                    --save_video     #(optional)Path to save the output video file.
+
+If you need to save the information of the tracked target in the video, you can add the parameter -- save_data. There is no need to fill in any information after this parameter. If you select this parameter, it will be displayed Generate a. json file in the ./results/object , where each line represents the tracking data for the corresponding frame. The data for each frame is saved in a dictionary format, where the key represents the category information for the target and the value represents the bounding box information for the corresponding category.
+
+    python detect.py --source        #(necessary) The input video,you can choice file or 0(webcam)
+                    --save_video     #(optional) Path to save the output video file.
+                    --save_data      #(optional) If you need to save the detection data, you can add this parameter, which will generate a json
+
+
+If you want to set tracking for a specific category, you can set the -- category parameter, which must list the category names you want to track. You can refer to YOLOv5's official 80 categories for category names. Please note that if you add this parameter but do not add any category names afterwards, it will not track any categories, which is not recommended.
+
+    python detect.py --source        #(necessary) The input video,you must input file name or 0(webcam)
+                    --save_video     #(optional) Path to save the output video file.
+                    --save_data      #(optional) If you need to save the detection data, you can add this parameter, which will generate a json
+                    --category       #(necessary) You must fill in the category name at the end
+
+
+# Others
+## yolov5 detector：
 
 ```python
 class Detector(baseDet):
@@ -23,17 +54,16 @@ class Detector(baseDet):
         self.build_config()
 
     def init_model(self):
-
-        self.weights = 'weights/yolov5m.pt'
+        from detect import parse_opt
+        args = parse_opt()
+        self.weights = args.weights
         self.device = '0' if torch.cuda.is_available() else 'cpu'
         self.device = select_device(self.device)
         model = attempt_load(self.weights, map_location=self.device)
         model.to(self.device).eval()
         model.half()
-        # torch.save(model, 'test.pt')
         self.m = model
-        self.names = model.module.names if hasattr(
-            model, 'module') else model.names
+        self.names = model.module.names if hasattr(model, 'module') else model.names
 
     def preprocess(self, img):
 
@@ -42,31 +72,30 @@ class Detector(baseDet):
         img = img[:, :, ::-1].transpose(2, 0, 1)
         img = np.ascontiguousarray(img)
         img = torch.from_numpy(img).to(self.device)
-        img = img.half()  # 半精度
-        img /= 255.0  # 图像归一化
+        img = img.half()  
+        img /= 255.0 
         if img.ndimension() == 3:
             img = img.unsqueeze(0)
 
         return img0, img
 
     def detect(self, im):
-
+        from detect import parse_opt
+        args = parse_opt()
         im0, img = self.preprocess(im)
-
         pred = self.m(img, augment=False)[0]
+        
         pred = pred.float()
-        pred = non_max_suppression(pred, self.threshold, 0.4)
-
+        pred = non_max_suppression(pred, self.threshold, 0.45)
         pred_boxes = []
         for det in pred:
 
             if det is not None and len(det):
-                det[:, :4] = scale_coords(
-                    img.shape[2:], det[:, :4], im0.shape).round()
+                det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
 
                 for *x, conf, cls_id in det:
                     lbl = self.names[int(cls_id)]
-                    if not lbl in ['person', 'car', 'truck']:
+                    if args.category is not None and lbl not in args.category:
                         continue
                     x1, y1 = int(x[0]), int(x[1])
                     x2, y2 = int(x[2]), int(x[3])
@@ -76,10 +105,9 @@ class Detector(baseDet):
         return im, pred_boxes
 
 ```
+Call the self.detetect method to return the image and prediction results
 
-调用 self.detect 方法返回图像和预测结果
-
-# DeepSort追踪器：
+## deepsort tracker：
 
 ```python
 deepsort = DeepSort(cfg.DEEPSORT.REID_CKPT,
@@ -89,51 +117,28 @@ deepsort = DeepSort(cfg.DEEPSORT.REID_CKPT,
                     use_cuda=True)
 ```
 
-调用 self.update 方法更新追踪结果
+Call the self.update method to update the tracking results
 
-# 运行demo：
-
-```bash
-python demo.py
-```
-
-# 训练自己的模型：
-参考我的另一篇博客：
-
-[【小白CV】手把手教你用YOLOv5训练自己的数据集（从Windows环境配置到模型部署）](https://blog.csdn.net/weixin_44936889/article/details/110661862)
-
-训练好后放到 weights 文件夹下
-
-# 调用接口：
-
-## 创建检测器：
+## create detector：
 
 ```python
 from AIDetector_pytorch import Detector
-
 det = Detector()
 ```
 
-## 调用检测接口：
+## call the detection interface：
 
 ```python
 result = det.feedCap(im)
 ```
 
-其中 im 为 BGR 图像
+Among them, im is the BGR image, the returned result is the dictionary, and result ['frame '] returns the visualized image
 
-返回的 result 是字典，result['frame'] 返回可视化后的图像
+## contact author：
 
-# 联系作者：
+> Github：https://github.com/HAOYON-666
+> QQ group: 679035342
 
-> B站：[https://space.bilibili.com/470550823](https://space.bilibili.com/470550823)
-
-> CSDN：[https://blog.csdn.net/weixin_44936889](https://blog.csdn.net/weixin_44936889)
-
-> AI Studio：[https://aistudio.baidu.com/aistudio/personalcenter/thirdview/67156](https://aistudio.baidu.com/aistudio/personalcenter/thirdview/67156)
-
-> Github：[https://github.com/Sharpiless](https://github.com/Sharpiless)
-
-遵循 GNU General Public License v3.0 协议，标明目标检测部分来源：https://github.com/ultralytics/yolov5/
+Following the GNU General Public License v3.0 protocol, indicate the source of the object detection section: https://github.com/ultralytics/yolov5/
 
 
