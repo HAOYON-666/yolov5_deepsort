@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+
 from models.experimental import attempt_load
 from utils.general import non_max_suppression, scale_coords
 from utils.BaseDetector import baseDet
@@ -14,17 +15,16 @@ class Detector(baseDet):
         self.build_config()
 
     def init_model(self):
-
-        self.weights = 'weights/yolov5s.pt'
+        from detect import parse_opt
+        args = parse_opt()
+        self.weights = args.weights
         self.device = '0' if torch.cuda.is_available() else 'cpu'
         self.device = select_device(self.device)
         model = attempt_load(self.weights, map_location=self.device)
         model.to(self.device).eval()
         model.half()
-        # torch.save(model, 'test.pt')
         self.m = model
-        self.names = model.module.names if hasattr(
-            model, 'module') else model.names
+        self.names = model.module.names if hasattr(model, 'module') else model.names
 
     def preprocess(self, img):
 
@@ -35,29 +35,30 @@ class Detector(baseDet):
         img = torch.from_numpy(img).to(self.device)
         img = img.half()  # 半精度
         img /= 255.0  # 图像归一化
+        #添加一个维度
         if img.ndimension() == 3:
             img = img.unsqueeze(0)
 
         return img0, img
 
     def detect(self, im):
-
+        from detect import parse_opt
+        args = parse_opt()
         im0, img = self.preprocess(im)
-
         pred = self.m(img, augment=False)[0]
+        
         pred = pred.float()
-        pred = non_max_suppression(pred, self.threshold, 0.4)
-
+        pred = non_max_suppression(pred, self.threshold, 0.45)
         pred_boxes = []
         for det in pred:
 
             if det is not None and len(det):
-                det[:, :4] = scale_coords(
-                    img.shape[2:], det[:, :4], im0.shape).round()
+                #调整比列
+                det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
 
                 for *x, conf, cls_id in det:
                     lbl = self.names[int(cls_id)]
-                    if not lbl in ['person', 'car', 'truck']:
+                    if args.category is not None and lbl not in args.category:
                         continue
                     x1, y1 = int(x[0]), int(x[1])
                     x2, y2 = int(x[2]), int(x[3])

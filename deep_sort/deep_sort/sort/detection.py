@@ -5,10 +5,10 @@ import numpy as np
 class Detection(object):
 
     def __init__(self, tlwh, cls_, confidence, feature):
-        self.tlwh = np.asarray(tlwh, dtype=np.float)
+        self.tlwh = np.asarray(tlwh, dtype=np.float64)
         self.cls_ = cls_
         self.confidence = float(confidence)
-        self.feature = np.asarray(feature, dtype=np.float32)
+        self.feature = np.asarray(feature, dtype=np.float64)
 
     def to_tlbr(self):
         """Convert bounding box to format `(min x, min y, max x, max y)`, i.e.,

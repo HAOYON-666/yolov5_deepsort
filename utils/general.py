@@ -1,9 +1,9 @@
 # YOLOv5 general utils
-
 import glob
 import logging
 import math
 import os
+import json
 import platform
 import random
 import re
@@ -690,3 +690,52 @@ def increment_path(path, exist_ok=False, sep='', mkdir=False):
     if not dir.exists() and mkdir:
         dir.mkdir(parents=True, exist_ok=True)  # make directory
     return path
+
+def cache_result(result):
+    result_dict = {}
+    for item in result:
+        coordinates = item[:4]
+        label = item[4]  
+        if label not in result_dict:
+            result_dict[label] = []
+        result_dict[label].append(coordinates)
+    return result_dict
+
+def save_result(filename, result_dict):
+    json_record = json.dumps(result_dict) + '\n'  
+    with open(filename, 'a') as file:  
+        file.write(json_record) 
+
+
+def find_filename(base_name):
+    if base_name is None:
+        return None
+    current_directory = os.getcwd()
+    
+    
+    name, ext = os.path.splitext(base_name)
+    if ext.lower() == '.json':
+        results_directory = os.path.join(current_directory, 'results', 'object')
+    else:
+        results_directory = os.path.join(current_directory, 'results', 'video')
+
+    video_extensions = ('.mp4', '.avi', '.mov', '.mkv', '.flv')  # 可以根据需要添加更多后缀名
+    
+    if ext.lower() in video_extensions:
+        results_directory = os.path.join(current_directory, 'results', 'video')
+    else:
+        results_directory = os.path.join(current_directory, 'results', 'object')
+    
+    if not os.path.exists(results_directory):
+        os.makedirs(results_directory) 
+    
+    counter = 0
+    while True:
+        full_path = os.path.join(results_directory,base_name) 
+        if not os.path.exists(full_path):
+            return full_path 
+        else:
+            base_name = f"{name}{counter}{ext}" 
+            counter += 1
+
+

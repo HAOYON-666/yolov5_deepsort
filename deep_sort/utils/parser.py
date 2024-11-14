@@ -13,14 +13,14 @@ class YamlParser(edict):
         if config_file is not None:
             assert(os.path.isfile(config_file))
             with open(config_file, 'r') as fo:
-                cfg_dict.update(yaml.load(fo.read()))
+                cfg_dict.update(yaml.safe_load(fo.read()))
 
         super(YamlParser, self).__init__(cfg_dict)
 
     
     def merge_from_file(self, config_file):
         with open(config_file, 'r') as fo:
-            self.update(yaml.load(fo.read()))
+            self.update(yaml.safe_load(fo.read()))
 
     
     def merge_from_dict(self, config_dict):
@@ -33,6 +33,6 @@ def get_config(config_file=None):
 
 if __name__ == "__main__":
     cfg = YamlParser(config_file="../configs/yolov3.yaml")
-    cfg.merge_from_file("../configs/deep_sort.yaml")
+    cfg.merge_from_file("../deep_sort/configs/deep_sort.yaml")
 
     import ipdb; ipdb.set_trace()

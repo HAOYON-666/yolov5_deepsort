@@ -22,21 +22,22 @@ class baseDet(object):
 
         self.font = cv2.FONT_HERSHEY_SIMPLEX
 
-    def feedCap(self, im):
+    def feedCap(self,im,filename):
 
         retDict = {
             'frame': None,
-            'faces': None,
+            'news': None,
             'list_of_ids': None,
-            'face_bboxes': []
+            'new_bboxes': []
         }
         self.frameCounter += 1
 
-        im, faces, face_bboxes = update_tracker(self, im)
+
+        im, news, new_bboxes = update_tracker(self, im, filename)
 
         retDict['frame'] = im
-        retDict['faces'] = faces
-        retDict['face_bboxes'] = face_bboxes
+        retDict['news'] = news
+        retDict['new_bboxes'] = new_bboxes
 
         return retDict
 

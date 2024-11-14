@@ -2,10 +2,13 @@ from deep_sort.utils.parser import get_config
 from deep_sort.deep_sort import DeepSort
 import torch
 import cv2
+import json
+from utils.general import cache_result,save_result,find_filename
+
 
 palette = (2 ** 11 - 1, 2 ** 15 - 1, 2 ** 20 - 1)
 cfg = get_config()
-cfg.merge_from_file("deep_sort/configs/deep_sort.yaml")
+cfg.merge_from_file("./deep_sort/configs/deep_sort.yaml")
 deepsort = DeepSort(cfg.DEEPSORT.REID_CKPT,
                     max_dist=cfg.DEEPSORT.MAX_DIST, min_confidence=cfg.DEEPSORT.MIN_CONFIDENCE,
                     nms_max_overlap=cfg.DEEPSORT.NMS_MAX_OVERLAP, max_iou_distance=cfg.DEEPSORT.MAX_IOU_DISTANCE,
@@ -18,10 +21,12 @@ def plot_bboxes(image, bboxes, line_thickness=None):
     tl = line_thickness or round(
         0.002 * (image.shape[0] + image.shape[1]) / 2) + 1  # line/font thickness
     for (x1, y1, x2, y2, cls_id, pos_id) in bboxes:
-        if cls_id in ['person']:
-            color = (0, 0, 255)
+        if cls_id == 'person':
+            color = (0, 0, 255)  
+        elif cls_id == 'car':
+            color = (255, 0, 0) 
         else:
-            color = (0, 255, 0)
+            color = (0, 255, 0)  
         c1, c2 = (x1, y1), (x2, y2)
         cv2.rectangle(image, c1, c2, color, thickness=tl, lineType=cv2.LINE_AA)
         tf = max(tl - 1, 1)  # font thickness
@@ -33,22 +38,17 @@ def plot_bboxes(image, bboxes, line_thickness=None):
 
     return image
 
-
-def update_tracker(target_detector, image):
+def update_tracker(target_detector, image,filename):
 
     new_faces = []
-    _, bboxes = target_detector.detect(image)
+    image, bboxes = target_detector.detect(image)
 
     bbox_xywh = []
     confs = []
     clss = []
 
     for x1, y1, x2, y2, cls_id, conf in bboxes:
-
-        obj = [
-            int((x1+x2)/2), int((y1+y2)/2),
-            x2-x1, y2-y1
-        ]
+        obj = [int((x1+x2)/2), int((y1+y2)/2),x2-x1, y2-y1]
         bbox_xywh.append(obj)
         confs.append(conf)
         clss.append(cls_id)
@@ -59,7 +59,7 @@ def update_tracker(target_detector, image):
     outputs = deepsort.update(xywhs, confss, clss, image)
 
     bboxes2draw = []
-    face_bboxes = []
+    new_bboxes = []
     current_ids = []
     for value in list(outputs):
         x1, y1, x2, y2, cls_, track_id = value
@@ -72,9 +72,7 @@ def update_tracker(target_detector, image):
                 target_detector.faceTracker[track_id] = 0
                 face = image[y1:y2, x1:x2]
                 new_faces.append((face, track_id))
-            face_bboxes.append(
-                (x1, y1, x2, y2)
-            )
+            new_bboxes.append((x1, y1, x2, y2))
 
     ids2delete = []
     for history_id in target_detector.faceTracker:
@@ -87,6 +85,11 @@ def update_tracker(target_detector, image):
         target_detector.faceTracker.pop(ids)
         print('-[INFO] Delete track id:', ids)
 
+
+    if filename is not None:
+        result_dict=cache_result(bboxes2draw)
+        save_result(filename,result_dict)
+
     image = plot_bboxes(image, bboxes2draw)
 
-    return image, new_faces, face_bboxes
+    return image, new_faces, new_bboxes
