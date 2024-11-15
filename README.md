@@ -15,7 +15,7 @@ This project uses the YOLOv5 model and Deepsort algorithm to achieve object trac
 
 3 Download weight file (optional)
 
-    Download the yolov5 weight. I already put the yolov5s.pt inside. If you need other models, please go to official site of yolov5. and place the downlaoded .pt file under ./weights/yolov5s.pt. And I also aready downloaded the deepsort weights. You can also download it from here, and place ckpt.t7 file under ./deep_sort/deep_sort/deep/checkpoint/ckpt.t7
+Download the yolov5 weight. I already put the yolov5s.pt inside. If you need other models, please go to official site of yolov5. and place the downlaoded .pt file under ./weights/yolov5s.pt. And I also aready downloaded the deepsort weights. You can also download it from here, and place ckpt.t7 file under ./deep_sort/deep_sort/deep/checkpoint/ckpt.t7
 
 
 # Run
@@ -43,7 +43,7 @@ If you want to set tracking for a specific category, you can set the -- category
 
 
 # Others
-## yolov5 detector：
+## yolov5 detector
 
 ```python
 class Detector(baseDet):
@@ -107,7 +107,7 @@ class Detector(baseDet):
 ```
 Call the self.detetect method to return the image and prediction results
 
-## deepsort tracker：
+## deepsort tracker
 
 ```python
 deepsort = DeepSort(cfg.DEEPSORT.REID_CKPT,
@@ -119,14 +119,14 @@ deepsort = DeepSort(cfg.DEEPSORT.REID_CKPT,
 
 Call the self.update method to update the tracking results
 
-## create detector：
+## create detector
 
 ```python
 from AIDetector_pytorch import Detector
 det = Detector()
 ```
 
-## call the detection interface：
+## call the detection interface
 
 ```python
 result = det.feedCap(im)
@@ -134,15 +134,10 @@ result = det.feedCap(im)
 
 Among them, im is the BGR image, the returned result is the dictionary, and result ['frame '] returns the visualized image
 
-## contact author：
+## contact author
 
-> Github：https://github.com/HAOYON-666
-> QQ group: 679035342
+Github：https://github.com/HAOYON-666
+QQ group: 679035342
 
+## attention
 Following the GNU General Public License v3.0 protocol, indicate the source of the object detection section: https://github.com/ultralytics/yolov5/
-
-
-# yolov5_deepsort
-# yolov5_deepsort
-# yolov5_deepsort
-# yolov5_deepsort
