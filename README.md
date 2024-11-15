@@ -34,7 +34,7 @@ If you need to save the information of the tracked target in the video, you can 
                     --save_data      #(optional) If you need to save the detection data, you can add this parameter, which will generate a json
 
 
-If you want to set tracking for a specific category, you can set the -- category parameter, which must list the category names you want to track. You can refer to YOLOv5's official 80 categories for category names. Please note that if you add this parameter but do not add any category names afterwards, it will not track any categories, which is not recommended.
+If you want to set tracking for a specific category, you can set the `-- category parameter` , which must list the category names you want to track. You can refer to YOLOv5's official 80 categories for category names. Please note that if you add this parameter but do not add any category names afterwards, it will not track any categories, which is not recommended.
 
     python detect.py --source        #(necessary) The input video,you must input file name or 0(webcam)
                     --save_video     #(optional) Path to save the output video file.
@@ -117,7 +117,7 @@ deepsort = DeepSort(cfg.DEEPSORT.REID_CKPT,
                     use_cuda=True)
 ```
 
-Call the self.update method to update the tracking results
+Call the `self.update` method to update the tracking results
 
 ## create detector
 
@@ -132,7 +132,7 @@ det = Detector()
 result = det.feedCap(im)
 ```
 
-Among them, im is the BGR image, the returned result is the dictionary, and result ['frame '] returns the visualized image
+Among them, im is the BGR image, the returned result is the dictionary, and `result ['frame ']` returns the visualized image
 
 ## contact author
 
