@@ -4,8 +4,7 @@ This project uses the YOLOv5 model and Deepsort algorithm to achieve object trac
 
 
 # Prepare
-* Create a virtual environment 
-
+1 Create a virtual environment 
     conda env create -f environment.yml   
     conda activate yolov5_deepsort   
 
