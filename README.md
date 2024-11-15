@@ -104,7 +104,7 @@ class Detector(baseDet):
         return im, pred_boxes
 
 ```
-Call the self.detetect method to return the image and prediction results
+Call the `self.detetect` method to return the image and prediction results
 
 ## deepsort tracker
 
