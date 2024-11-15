@@ -15,14 +15,14 @@ This project uses the YOLOv5 model and Deepsort algorithm to achieve object trac
 
 3 Download weight file (optional)
 
-Download the yolov5 weight. I already put the yolov5s.pt inside. If you need other models, please go to official site of yolov5. and place the downlaoded .pt file under ./weights/yolov5s.pt. And I also aready downloaded the deepsort weights. You can also download it from here, and place ckpt.t7 file under ./deep_sort/deep_sort/deep/checkpoint/ckpt.t7
+Download the yolov5 weight. I already put the yolov5s.pt inside. If you need other models, please go to official site of yolov5. and place the downlaoded .pt file under `./weights/yolov5s.pt` . And I also aready downloaded the deepsort weights. You can also download it from here, and place ckpt.t7 file under `./deep_sort/deep_sort/deep/checkpoint/ckpt.t7` .
 
 
 # Run
 
     cd yolov5_deepsort
 
-If you want to track the target in this video or camera, you can run this script by replacing the parameter after` -- source `with the video file path or 0 (webcam), which is a required parameter. Then you can choose to set` -- save_video`, which is an output video file name, but it is not necessary. If you do not set it, it will default to result.mp4 and the output video file will be saved Under the directory of `./results/video`.
+If you want to track the target in this video or camera, you can run this script by replacing the parameter after `-- source` with the video file path or 0 (webcam), which is a required parameter. Then you can choose to set `-- save_video` , which is an output video file name, but it is not necessary. If you do not set it, it will default to result.mp4 and the output video file will be saved Under the directory of  `./results/video` .
 
     python detect.py --source        #(necessary)The input video,you must input file name or 0(webcam)
                     --save_video     #(optional)Path to save the output video file.
@@ -137,7 +137,7 @@ Among them, im is the BGR image, the returned result is the dictionary, and resu
 ## contact author
 
 Github：https://github.com/HAOYON-666<br>
-QQ group: 679035342
+QQ Group: 679035342
 
 ## attention
 Following the GNU General Public License v3.0 protocol, indicate the source of the object detection section: https://github.com/ultralytics/yolov5/
