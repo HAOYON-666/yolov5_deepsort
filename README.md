@@ -27,7 +27,7 @@ If you want to track the target in this video or camera, you can run this script
     python detect.py --source        #(necessary)The input video,you must input file name or 0(webcam)
                     --save_video     #(optional)Path to save the output video file.
 
-If you need to save the information of the tracked target in the video, you can add the parameter -- save_data. There is no need to fill in any information after this parameter. If you select this parameter, it will be displayed Generate a. json file in the ./results/object , where each line represents the tracking data for the corresponding frame. The data for each frame is saved in a dictionary format, where the key represents the category information for the target and the value represents the bounding box information for the corresponding category.
+If you need to save the information of the tracked target in the video, you can add the parameter `-- save_data` . There is no need to fill in any information after this parameter. If you select this parameter, it will be displayed Generate a. json file in the `./results/object` , where each line represents the tracking data for the corresponding frame. The data for each frame is saved in a dictionary format, where the key represents the category information for the target and the value represents the bounding box information for the corresponding category.
 
     python detect.py --source        #(necessary) The input video,you can choice file or 0(webcam)
                     --save_video     #(optional) Path to save the output video file.
