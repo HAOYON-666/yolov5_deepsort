@@ -4,16 +4,16 @@ This project uses the YOLOv5 model and Deepsort algorithm to achieve object trac
 
 
 # Prepare
-1 Create a virtual environment 
+* Create a virtual environment 
 
     conda env create -f environment.yml   
     conda activate yolov5_deepsort   
 
-2 Install all dependencies
+* Install all dependencies
 
     pip install -r requirements.txt
 
-3 Download weight file (optional)
+* Download weight file (optional)
 
 Download the yolov5 weight. I already put the yolov5s.pt inside. If you need other models, please go to official site of yolov5. and place the downlaoded .pt file under `./weights/yolov5s.pt` . And I also aready downloaded the deepsort weights. You can also download it from here, and place ckpt.t7 file under `./deep_sort/deep_sort/deep/checkpoint/ckpt.t7` .
 
