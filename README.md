@@ -1,5 +1,6 @@
 # Introduction
 This project uses the YOLOv5 model and Deepsort algorithm to achieve object tracking and counting. The code for each part has been encapsulated and can be easily embedded into your own project. In this project, you can add parameters to specify the video or local camera that needs to be inferred; You can also specify whether the parameter will save the tracked data, which includes target category and bounding box information; You can also add parameters to track the targets you are interested in and save the corresponding tracking data. Below are some detailed introduction, hoping to get your star!
+
 ![demo](./image.jpg)
 
 
